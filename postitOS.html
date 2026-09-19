@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Capture Rapide</title>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; margin: 0; font-family: sans-serif; }
+        input { width: 400px; padding: 15px; font-size: 18px; border-radius: 8px; border: 1px solid #ccc; outline: none; }
+        input:focus { border-color: #007BFF; box-shadow: 0 0 5px rgba(0,123,255,0.5); }
+    </style>
+</head>
+<body>
+
+    <input type="text" id="noteInput" placeholder="Note ton idée ici et tape Entrée..." autofocus>
+
+    <script>
+        const input = document.getElementById('noteInput');
+        const webhookUrl = "https://hook.eu2.make.com/3k0lnke3j2x2u7xtdoil82ejkvbvhv6q";
+
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && input.value.trim() !== '') {
+                const note = input.value;
+                input.value = 'Envoi en cours...';
+                input.disabled = true;
+
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ raw_note: note, source: "web_popup" })
+                }).then(() => {
+                    input.value = '';
+                    input.disabled = false;
+                    input.focus();
+                }).catch(err => {
+                    alert("Erreur d'envoi");
+                    input.disabled = false;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
