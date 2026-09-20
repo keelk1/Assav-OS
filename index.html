@@ -4,26 +4,50 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Assav OS</title>
+  
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS SDK -->
+  <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: { 500: '#3b82f6' }
-          }
-        }
-      }
+  
+  <!-- Typographie Anthropic : Newsreader (Éditorial Sérif) + Inter (Interface) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      border-radius: 0px !important; /* 0 radius absolu */
     }
-  </script>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000000;
+    }
+    .font-serif-anthropic {
+      font-family: 'Newsreader', Georgia, serif;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Scrollbar discrète carrée */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #000000;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #262626;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+  </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen font-sans antialiased selection:bg-zinc-800 pb-20">
+<body class="bg-black text-neutral-200 min-h-screen antialiased selection:bg-[#f59e72] selection:text-black pb-24">
 
   <!-- Configuration Supabase -->
   <script>
@@ -33,97 +57,177 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
 
-  <!-- En-tête / Navigation -->
-  <header class="border-b border-zinc-800/80 sticky top-0 bg-zinc-950/80 backdrop-blur-md z-20">
-    <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+  <!-- En-tête / Barre de navigation -->
+  <header class="border-b border-[#222222] sticky top-0 bg-black/90 backdrop-blur-md z-30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-700 flex items-center justify-center font-bold text-xs tracking-wider text-zinc-200">
-          AS
+        <div class="w-7 h-7 bg-[#141414] border border-[#2a2a2a] flex items-center justify-center font-serif-anthropic font-medium text-sm text-[#f59e72]">
+          A
         </div>
-        <span class="font-semibold text-zinc-100 tracking-tight text-sm sm:text-base">assav-os</span>
+        <span class="font-serif-anthropic text-xl text-neutral-100 tracking-tight">assav-os</span>
       </div>
 
-      <!-- Onglets Tâches / Idées / Inbox -->
-      <div class="flex bg-zinc-900 border border-zinc-800 rounded-xl p-1 text-xs sm:text-sm font-medium gap-1">
-        <button id="tab-tasks" onclick="switchTab('tasks')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 text-white shadow-sm transition-all">
-          <i data-lucide="check-square" class="w-4 h-4"></i>
+      <!-- Navigation Principale -->
+      <nav class="flex border border-[#222222] bg-[#0c0c0c] p-0.5 text-xs tracking-wide uppercase font-medium">
+        <button id="tab-tasks" onclick="switchTab('tasks')" class="flex items-center gap-2 px-4 py-2 bg-[#1c1c1c] text-[#facc15] border border-[#facc15]/30 transition-all">
+          <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
           <span>Tâches</span>
-          <span id="tasks-count" class="bg-zinc-700/60 text-zinc-300 text-[10px] px-1.5 py-0.2 rounded-full">0</span>
+          <span id="tasks-count" class="text-[10px] bg-black px-1.5 py-0.2 text-neutral-400 font-mono-code">0</span>
         </button>
-        <button id="tab-ideas" onclick="switchTab('ideas')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition-all">
-          <i data-lucide="lightbulb" class="w-4 h-4"></i>
+        <button id="tab-ideas" onclick="switchTab('ideas')" class="flex items-center gap-2 px-4 py-2 text-neutral-400 hover:text-[#60a5fa] transition-all">
+          <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i>
           <span>Idées</span>
-          <span id="ideas-count" class="bg-zinc-700/60 text-zinc-300 text-[10px] px-1.5 py-0.2 rounded-full">0</span>
+          <span id="ideas-count" class="text-[10px] bg-black px-1.5 py-0.2 text-neutral-400 font-mono-code">0</span>
         </button>
-        <button id="tab-inbox" onclick="switchTab('inbox')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition-all">
-          <i data-lucide="inbox" class="w-4 h-4"></i>
-          <span>Inbox</span>
-          <span id="inbox-count" class="bg-zinc-700/60 text-zinc-300 text-[10px] px-1.5 py-0.2 rounded-full">0</span>
+        <button id="tab-inbox" onclick="switchTab('inbox')" class="flex items-center gap-2 px-4 py-2 text-neutral-400 hover:text-[#f59e72] transition-all">
+          <i data-lucide="database" class="w-3.5 h-3.5"></i>
+          <span>Inbox (BDD)</span>
+          <span id="inbox-count" class="text-[10px] bg-black px-1.5 py-0.2 text-neutral-400 font-mono-code">0</span>
         </button>
-      </div>
+      </nav>
     </div>
   </header>
 
-  <!-- Notification Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 bg-zinc-800/90 backdrop-blur-md border border-zinc-700 text-zinc-200 text-xs px-3.5 py-2 rounded-xl shadow-2xl opacity-0 transition-opacity duration-200 pointer-events-none flex items-center gap-2 z-50">
-    <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
-    <span id="toast-text">Modifié dans Supabase</span>
+  <!-- Notification Toast (Accent Orange Pastel) -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-[#141414] border border-[#f59e72]/50 text-neutral-200 text-xs px-4 py-2.5 shadow-2xl opacity-0 transition-opacity duration-150 pointer-events-none flex items-center gap-2 z-50">
+    <span class="w-1.5 h-1.5 bg-[#f59e72]"></span>
+    <span id="toast-text" class="font-mono-code text-[11px]">Enregistré dans Supabase</span>
   </div>
 
-  <!-- Contenu Principal -->
-  <main class="max-w-4xl mx-auto px-4 py-8">
-    <div id="loading" class="text-center py-24 text-zinc-500 text-sm animate-pulse">
-      Connexion à ta base Supabase...
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <div id="loading" class="text-center py-24 text-neutral-500 font-mono-code text-xs">
+      Synchronisation avec Supabase...
     </div>
 
-    <!-- Section TÂCHES -->
-    <div id="tasks-section" class="space-y-4 hidden">
-      <!-- Formulaire Ajout Tâche -->
-      <form onsubmit="createTask(event)" class="flex gap-2">
-        <input id="new-task-title" type="text" placeholder="+ Ajouter une tâche directe (Entrée pour créer)..." 
-          class="flex-1 bg-zinc-900/60 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-zinc-600 transition-colors" />
-        <button type="submit" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium px-4 py-2.5 rounded-xl border border-zinc-700 transition-colors">
-          Ajouter
-        </button>
-      </form>
-      <div id="tasks-list" class="space-y-3"></div>
-    </div>
+    <!-- ========================================== -->
+    <!-- SECTION TÂCHES (JAUNE) -->
+    <!-- ========================================== -->
+    <div id="tasks-section" class="space-y-6 hidden">
+      <!-- Filtre sous-menu & Formulaire rapide -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#222222] pb-4">
+        <!-- Sous-menu Business / Perso -->
+        <div class="flex border border-[#222222] bg-[#0d0d0d] text-xs font-mono-code">
+          <button onclick="setTaskCategoryFilter('all')" id="task-filter-all" class="px-3 py-1.5 bg-[#1a1a1a] text-[#facc15] font-medium">TOUTES</button>
+          <button onclick="setTaskCategoryFilter('business')" id="task-filter-business" class="px-3 py-1.5 text-neutral-400 hover:text-neutral-200 border-l border-[#222222]">BUSINESS</button>
+          <button onclick="setTaskCategoryFilter('perso')" id="task-filter-perso" class="px-3 py-1.5 text-neutral-400 hover:text-neutral-200 border-l border-[#222222]">PERSO</button>
+        </div>
 
-    <!-- Section IDÉES -->
-    <div id="ideas-section" class="space-y-4 hidden">
-      <!-- Formulaire Ajout Idée -->
-      <form onsubmit="createIdea(event)" class="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-4 space-y-2.5">
-        <input id="new-idea-title" type="text" placeholder="Titre de la nouvelle idée..." required
-          class="w-full bg-zinc-950 border border-zinc-800/80 rounded-xl px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-zinc-600" />
-        <textarea id="new-idea-summary" rows="2" placeholder="Résumé factuel ou problème ciblé..."
-          class="w-full bg-zinc-950 border border-zinc-800/80 rounded-xl px-3 py-2 text-xs text-zinc-300 placeholder:text-zinc-600 outline-none focus:border-zinc-600"></textarea>
-        <div class="flex justify-end">
-          <button type="submit" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium px-4 py-2 rounded-xl border border-zinc-700 transition-colors">
-            Créer l'idée
+        <!-- Formulaire création rapide -->
+        <form onsubmit="createTask(event)" class="flex flex-1 max-w-xl gap-0 border border-[#262626] bg-[#111111]">
+          <select id="new-task-category" class="bg-black text-[#facc15] text-xs px-3 border-r border-[#262626] outline-none font-mono-code cursor-pointer uppercase">
+            <option value="business">Business</option>
+            <option value="perso">Perso</option>
+          </select>
+          <input id="new-task-title" type="text" placeholder="Nouvelle tâche concrète..." 
+            class="flex-1 bg-transparent px-3 py-2 text-xs text-neutral-200 placeholder:text-neutral-600 outline-none" required />
+          <button type="submit" class="bg-[#1a1a1a] hover:bg-[#242424] text-[#facc15] px-4 text-xs font-mono-code uppercase border-l border-[#262626] transition-colors">
+            Créer
           </button>
+        </form>
+      </div>
+
+      <!-- Liste des tâches -->
+      <div id="tasks-list" class="space-y-2"></div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION IDÉES (BLEU) -->
+    <!-- ========================================== -->
+    <div id="ideas-section" class="space-y-6 hidden">
+      <!-- Filtre sous-menu & Bouton création -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#222222] pb-4">
+        <div class="flex border border-[#222222] bg-[#0d0d0d] text-xs font-mono-code">
+          <button onclick="setIdeaCategoryFilter('all')" id="idea-filter-all" class="px-3 py-1.5 bg-[#1a1a1a] text-[#60a5fa] font-medium">TOUTES</button>
+          <button onclick="setIdeaCategoryFilter('business')" id="idea-filter-business" class="px-3 py-1.5 text-neutral-400 hover:text-neutral-200 border-l border-[#222222]">BUSINESS</button>
+          <button onclick="setIdeaCategoryFilter('perso')" id="idea-filter-perso" class="px-3 py-1.5 text-neutral-400 hover:text-neutral-200 border-l border-[#222222]">PERSO</button>
+        </div>
+
+        <button onclick="toggleIdeaForm()" class="bg-[#111111] hover:bg-[#1a1a1a] border border-[#2a2a2a] text-[#60a5fa] text-xs px-4 py-2 font-mono-code flex items-center gap-2 self-start transition-colors">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>FORMULER UNE IDÉE</span>
+        </button>
+      </div>
+
+      <!-- Formulaire d'idée pliable -->
+      <form id="idea-form" onsubmit="createIdea(event)" class="hidden bg-[#111111] border border-[#262626] p-4 space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input id="new-idea-title" type="text" placeholder="Titre de l'idée ou hypothèse..." required
+            class="bg-black border border-[#262626] px-3 py-2 text-xs text-neutral-100 placeholder:text-neutral-600 outline-none" />
+          
+          <div class="flex gap-2">
+            <select id="new-idea-category" class="flex-1 bg-black border border-[#262626] text-xs px-2 py-2 text-[#60a5fa] font-mono-code outline-none">
+              <option value="business">Catégorie: Business</option>
+              <option value="perso">Catégorie: Perso</option>
+            </select>
+            <select id="new-idea-importance" class="flex-1 bg-black border border-[#262626] text-xs px-2 py-2 text-neutral-300 font-mono-code outline-none">
+              <option value="haute">Importance: Haute</option>
+              <option value="moyenne" selected>Importance: Moyenne</option>
+              <option value="basse">Importance: Basse</option>
+            </select>
+          </div>
+        </div>
+
+        <textarea id="new-idea-summary" rows="2" placeholder="Problème ciblé, verbatim ou résumé factuel..."
+          class="w-full bg-black border border-[#262626] p-3 text-xs text-neutral-300 placeholder:text-neutral-600 outline-none"></textarea>
+
+        <div class="flex justify-end gap-2">
+          <button type="button" onclick="toggleIdeaForm()" class="px-3 py-1.5 text-xs text-neutral-400 hover:text-neutral-200 font-mono-code">ANNULER</button>
+          <button type="submit" class="bg-[#1c1c1c] border border-[#60a5fa]/40 text-[#60a5fa] px-4 py-1.5 text-xs font-mono-code">ENREGISTRER L'IDÉE</button>
         </div>
       </form>
+
+      <!-- Grille des idées -->
       <div id="ideas-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </div>
 
-    <!-- Section INBOX -->
+    <!-- ========================================== -->
+    <!-- SECTION INBOX (DATABASE VIEW) -->
+    <!-- ========================================== -->
     <div id="inbox-section" class="space-y-4 hidden">
-      <div id="inbox-list" class="space-y-4"></div>
+      <div class="flex items-center justify-between border-b border-[#222222] pb-3">
+        <div class="text-xs font-mono-code text-neutral-400 uppercase flex items-center gap-2">
+          <span class="w-2 h-2 bg-[#f59e72]"></span>
+          <span>Table brute des captures (Édition directe en base de données)</span>
+        </div>
+        <button onclick="loadData()" class="text-neutral-400 hover:text-[#f59e72] text-xs font-mono-code flex items-center gap-1.5">
+          <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+          <span>RAFRAÎCHIR</span>
+        </button>
+      </div>
+
+      <!-- Table Database -->
+      <div class="border border-[#262626] bg-[#0c0c0c] overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="border-b border-[#262626] bg-[#141414] text-neutral-400 font-mono-code text-[11px] uppercase tracking-wider">
+              <th class="p-3 border-r border-[#262626] w-32">Date</th>
+              <th class="p-3 border-r border-[#262626] w-28">Entité</th>
+              <th class="p-3 border-r border-[#262626]">Note Brute (Éditable)</th>
+              <th class="p-3 border-r border-[#262626] w-56">Raisonnement IA</th>
+              <th class="p-3 border-r border-[#262626] w-28">Statut</th>
+              <th class="p-3 w-12 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="inbox-table-body" class="divide-y divide-[#1f1f1f] font-mono-code text-xs"></tbody>
+        </table>
+      </div>
     </div>
   </main>
 
   <script>
     let currentTab = 'tasks';
+    let taskCategoryFilter = 'all';
+    let ideaCategoryFilter = 'all';
+
     let tasks = [];
     let ideas = [];
     let inboxItems = [];
 
-    // Notification toast
-    function notify(text = 'Modifié dans Supabase') {
+    function notify(text = 'Enregistré dans Supabase') {
       const toast = document.getElementById('toast');
       document.getElementById('toast-text').innerText = text;
       toast.classList.remove('opacity-0');
-      setTimeout(() => toast.classList.add('opacity-0'), 2000);
+      setTimeout(() => toast.classList.add('opacity-0'), 1800);
     }
 
     async function loadData() {
@@ -143,7 +247,7 @@
 
       renderTasks();
       renderIdeas();
-      renderInbox();
+      renderInboxTable();
       lucide.createIcons();
     }
 
@@ -154,12 +258,19 @@
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         const sec = document.getElementById(`${t}-section`);
+        
         if (t === tab) {
-          btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 text-white shadow-sm transition-all';
           sec.classList.remove('hidden');
+          if (t === 'tasks') {
+            btn.className = 'flex items-center gap-2 px-4 py-2 bg-[#1c1c1c] text-[#facc15] border border-[#facc15]/30 transition-all';
+          } else if (t === 'ideas') {
+            btn.className = 'flex items-center gap-2 px-4 py-2 bg-[#1c1c1c] text-[#60a5fa] border border-[#60a5fa]/30 transition-all';
+          } else {
+            btn.className = 'flex items-center gap-2 px-4 py-2 bg-[#1c1c1c] text-[#f59e72] border border-[#f59e72]/30 transition-all';
+          }
         } else {
-          btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition-all';
           sec.classList.add('hidden');
+          btn.className = 'flex items-center gap-2 px-4 py-2 text-neutral-400 hover:text-neutral-200 border border-transparent transition-all';
         }
       });
 
@@ -167,56 +278,76 @@
     }
 
     // ==========================================
-    // TÂCHES
+    // TÂCHES (JAUNE)
     // ==========================================
+    function setTaskCategoryFilter(cat) {
+      taskCategoryFilter = cat;
+      ['all', 'business', 'perso'].forEach(c => {
+        const b = document.getElementById(`task-filter-${c}`);
+        if (c === cat) {
+          b.className = 'px-3 py-1.5 bg-[#1a1a1a] text-[#facc15] font-medium border-l border-[#222222] first:border-l-0';
+        } else {
+          b.className = 'px-3 py-1.5 text-neutral-400 hover:text-neutral-200 border-l border-[#222222] first:border-l-0';
+        }
+      });
+      renderTasks();
+    }
+
     function renderTasks() {
       const list = document.getElementById('tasks-list');
-      const pendingCount = tasks.filter(t => t.status !== 'done').length;
-      document.getElementById('tasks-count').innerText = pendingCount;
+      const filteredTasks = tasks.filter(t => {
+        if (taskCategoryFilter === 'all') return true;
+        return (t.category || 'business').toLowerCase() === taskCategoryFilter;
+      });
 
-      if (tasks.length === 0) {
-        list.innerHTML = `<div class="text-center py-16 text-zinc-500 border border-dashed border-zinc-800 rounded-2xl text-sm">Aucune tâche enregistrée.</div>`;
+      document.getElementById('tasks-count').innerText = tasks.filter(t => t.status !== 'done').length;
+
+      if (filteredTasks.length === 0) {
+        list.innerHTML = `<div class="p-12 text-center text-neutral-600 font-mono-code text-xs border border-dashed border-[#222222]">AUCUNE TÂCHE DANS CETTE VUE.</div>`;
         return;
       }
 
-      list.innerHTML = tasks.map(task => {
+      list.innerHTML = filteredTasks.map(task => {
         const isDone = task.status === 'done';
         const dueDate = task.due_date ? task.due_date.substring(0, 10) : '';
+        const cat = task.category || 'business';
 
         return `
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border gap-3 transition-all ${
-            isDone ? 'bg-zinc-950 border-zinc-900 opacity-60' : 'bg-zinc-900/40 border-zinc-800/80 hover:border-zinc-700'
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-[#111111] border border-[#222222] hover:border-[#333333] transition-all gap-3 ${
+            isDone ? 'opacity-40' : ''
           }">
             <div class="flex items-start gap-3 flex-1 min-w-0">
-              <button onclick="toggleTask('${task.id}', '${task.status}')" class="mt-1 text-zinc-400 hover:text-emerald-400 transition-colors flex-shrink-0">
-                <i data-lucide="${isDone ? 'check-circle-2' : 'circle'}" class="w-5 h-5 ${isDone ? 'text-emerald-500' : ''}"></i>
+              <!-- Case à cocher carrée -->
+              <button onclick="toggleTask('${task.id}', '${task.status}')" class="mt-0.5 text-neutral-500 hover:text-[#facc15] transition-colors flex-shrink-0">
+                <div class="w-4 h-4 border ${isDone ? 'bg-[#facc15] border-[#facc15]' : 'border-neutral-500'} flex items-center justify-center">
+                  ${isDone ? '<i data-lucide="check" class="w-3 h-3 text-black stroke-[3]"></i>' : ''}
+                </div>
               </button>
-              
-              <div class="flex-1 min-w-0 space-y-1">
-                <!-- Titre modifiable en direct -->
+
+              <div class="flex-1 min-w-0">
                 <input type="text" value="${escapeHtml(task.title || '')}" 
                   onchange="updateTaskField('${task.id}', 'title', this.value)"
-                  class="w-full bg-transparent font-medium text-sm outline-none border-b border-transparent focus:border-zinc-600 transition-colors ${
-                    isDone ? 'line-through text-zinc-500' : 'text-zinc-200'
+                  class="w-full bg-transparent font-medium text-xs sm:text-sm text-neutral-100 outline-none focus:text-[#facc15] transition-colors ${
+                    isDone ? 'line-through text-neutral-500' : ''
                   }" />
-
-                <!-- Description modifiable -->
-                <input type="text" value="${escapeHtml(task.description || '')}" placeholder="Ajouter une description..."
-                  onchange="updateTaskField('${task.id}', 'description', this.value)"
-                  class="w-full bg-transparent text-xs text-zinc-500 placeholder:text-zinc-700 outline-none border-b border-transparent focus:border-zinc-600 transition-colors" />
+                ${task.description ? `<p class="text-[11px] text-neutral-500 mt-0.5 font-mono-code">${escapeHtml(task.description)}</p>` : ''}
               </div>
             </div>
 
-            <!-- Échéance & Suppression -->
-            <div class="flex items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-800/50 justify-between sm:justify-end">
-              <div class="flex items-center gap-1.5">
-                <i data-lucide="calendar" class="w-3.5 h-3.5 text-zinc-500"></i>
-                <input type="date" value="${dueDate}" onchange="updateTaskField('${task.id}', 'due_date', this.value || null)"
-                  class="bg-zinc-950 border border-zinc-800 text-zinc-400 text-xs rounded-lg px-2 py-1 outline-none focus:border-zinc-600 transition-colors cursor-pointer" />
-              </div>
+            <div class="flex items-center gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#1f1f1f] justify-between sm:justify-end">
+              <!-- Badge Catégorie -->
+              <select onchange="updateTaskField('${task.id}', 'category', this.value)" class="bg-black text-[10px] uppercase font-mono-code px-2 py-1 border border-[#262626] text-neutral-300 outline-none cursor-pointer">
+                <option value="business" ${cat === 'business' ? 'selected' : ''}>Business</option>
+                <option value="perso" ${cat === 'perso' ? 'selected' : ''}>Perso</option>
+              </select>
 
-              <button onclick="deleteTask('${task.id}')" title="Supprimer la tâche" class="text-zinc-600 hover:text-red-400 p-1 transition-colors">
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              <!-- Date -->
+              <input type="date" value="${dueDate}" onchange="updateTaskField('${task.id}', 'due_date', this.value || null)"
+                class="bg-black border border-[#262626] text-neutral-400 text-[11px] font-mono-code px-2 py-0.5 outline-none cursor-pointer" />
+
+              <!-- Supprimer -->
+              <button onclick="deleteTask('${task.id}')" class="text-neutral-600 hover:text-red-400 p-1 transition-colors">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
               </button>
             </div>
           </div>
@@ -227,14 +358,16 @@
 
     async function createTask(e) {
       e.preventDefault();
-      const input = document.getElementById('new-task-title');
-      const title = input.value.trim();
+      const titleInput = document.getElementById('new-task-title');
+      const catInput = document.getElementById('new-task-category');
+      const title = titleInput.value.trim();
+      const category = catInput.value;
       if (!title) return;
 
-      const { data, error } = await supabaseClient.from('tasks').insert([{ title, status: 'inbox' }]).select();
+      const { data } = await supabaseClient.from('tasks').insert([{ title, category, status: 'inbox' }]).select();
       if (data) {
         tasks.unshift(data[0]);
-        input.value = '';
+        titleInput.value = '';
         renderTasks();
         notify('Tâche ajoutée');
       }
@@ -242,9 +375,10 @@
 
     async function updateTaskField(id, field, value) {
       await supabaseClient.from('tasks').update({ [field]: value }).eq('id', id);
-      const t = tasks.find(item => item.id === id);
+      const t = tasks.find(i => i.id === id);
       if (t) t[field] = value;
       notify();
+      if (field === 'category') renderTasks();
     }
 
     async function toggleTask(id, currentStatus) {
@@ -262,63 +396,101 @@
     }
 
     // ==========================================
-    // IDÉES
+    // IDÉES (BLEU)
     // ==========================================
+    function toggleIdeaForm() {
+      const f = document.getElementById('idea-form');
+      f.classList.toggle('hidden');
+    }
+
+    function setIdeaCategoryFilter(cat) {
+      ideaCategoryFilter = cat;
+      ['all', 'business', 'perso'].forEach(c => {
+        const b = document.getElementById(`idea-filter-${c}`);
+        if (c === cat) {
+          b.className = 'px-3 py-1.5 bg-[#1a1a1a] text-[#60a5fa] font-medium border-l border-[#222222] first:border-l-0';
+        } else {
+          b.className = 'px-3 py-1.5 text-neutral-400 hover:text-neutral-200 border-l border-[#222222] first:border-l-0';
+        }
+      });
+      renderIdeas();
+    }
+
     function renderIdeas() {
       const list = document.getElementById('ideas-list');
+      const filteredIdeas = ideas.filter(i => {
+        if (ideaCategoryFilter === 'all') return true;
+        return (i.category || 'business').toLowerCase() === ideaCategoryFilter;
+      });
+
       document.getElementById('ideas-count').innerText = ideas.length;
 
-      if (ideas.length === 0) {
-        list.innerHTML = `<div class="col-span-2 text-center py-16 text-zinc-500 border border-dashed border-zinc-800 rounded-2xl text-sm">Aucune idée capturée.</div>`;
+      if (filteredIdeas.length === 0) {
+        list.innerHTML = `<div class="col-span-2 p-12 text-center text-neutral-600 font-mono-code text-xs border border-dashed border-[#222222]">AUCUNE IDÉE DANS CETTE VUE.</div>`;
         return;
       }
 
-      list.innerHTML = ideas.map(idea => {
+      list.innerHTML = filteredIdeas.map(idea => {
         const dateStr = new Date(idea.created_at).toLocaleDateString('fr-FR');
-        const tagsHtml = (idea.tags && Array.isArray(idea.tags)) 
-          ? idea.tags.map(t => `<span class="bg-zinc-800 text-zinc-300 text-[10px] px-2 py-0.5 rounded">#${t}</span>`).join(' ') 
-          : '';
+        const cat = idea.category || 'business';
+        const imp = (idea.importance || 'moyenne').toLowerCase();
+
+        // Style d'importance
+        let impBadge = 'border-neutral-700 text-neutral-400';
+        if (imp === 'haute') impBadge = 'border-red-500/50 text-red-400 bg-red-500/5';
+        if (imp === 'moyenne') impBadge = 'border-[#f59e72]/50 text-[#f59e72] bg-[#f59e72]/5';
 
         return `
-          <div class="bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 rounded-2xl p-5 flex flex-col justify-between transition-all space-y-3">
+          <div class="bg-[#111111] border border-[#222222] hover:border-[#333333] p-5 flex flex-col justify-between transition-all space-y-4">
             <div>
-              <div class="flex items-center justify-between mb-3">
-                <span class="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                  <i data-lucide="sparkles" class="w-3 h-3"></i>
-                  Idée
-                </span>
+              <!-- Ligne Tags & Classification -->
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-mono-code uppercase px-2 py-0.5 bg-[#60a5fa]/10 text-[#60a5fa] border border-[#60a5fa]/30 font-medium">
+                    IDÉE
+                  </span>
+                  <!-- Sélecteur Catégorie -->
+                  <select onchange="updateIdeaField('${idea.id}', 'category', this.value)" class="bg-black text-[10px] uppercase font-mono-code px-2 py-0.5 border border-[#262626] text-neutral-300 outline-none cursor-pointer">
+                    <option value="business" ${cat === 'business' ? 'selected' : ''}>Business</option>
+                    <option value="perso" ${cat === 'perso' ? 'selected' : ''}>Perso</option>
+                  </select>
+                </div>
 
                 <div class="flex items-center gap-2">
-                  <select onchange="updateIdeaField('${idea.id}', 'status', this.value)" class="bg-zinc-950 border border-zinc-800 text-zinc-400 text-xs rounded-lg px-2 py-1 outline-none focus:border-zinc-600 cursor-pointer">
-                    <option value="capturée" ${idea.status === 'capturée' ? 'selected' : ''}>Capturée</option>
-                    <option value="à qualifier" ${idea.status === 'à qualifier' ? 'selected' : ''}>À qualifier</option>
-                    <option value="en cours" ${idea.status === 'en cours' ? 'selected' : ''}>En cours</option>
-                    <option value="validée" ${idea.status === 'validée' ? 'selected' : ''}>Validée</option>
-                    <option value="abandonnée" ${idea.status === 'abandonnée' ? 'selected' : ''}>Abandonnée</option>
+                  <!-- Sélecteur Importance -->
+                  <select onchange="updateIdeaField('${idea.id}', 'importance', this.value)" class="bg-black text-[10px] uppercase font-mono-code px-2 py-0.5 border outline-none cursor-pointer ${impBadge}">
+                    <option value="haute" ${imp === 'haute' ? 'selected' : ''}>Imp: Haute</option>
+                    <option value="moyenne" ${imp === 'moyenne' ? 'selected' : ''}>Imp: Moyenne</option>
+                    <option value="basse" ${imp === 'basse' ? 'selected' : ''}>Imp: Basse</option>
                   </select>
 
-                  <button onclick="deleteIdea('${idea.id}')" title="Supprimer l'idée" class="text-zinc-600 hover:text-red-400 p-1 transition-colors">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  <button onclick="deleteIdea('${idea.id}')" class="text-neutral-600 hover:text-red-400 p-0.5 transition-colors">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                   </button>
                 </div>
               </div>
 
-              <!-- Titre d'idée modifiable -->
+              <!-- Titre avec police Anthropic Sérif -->
               <input type="text" value="${escapeHtml(idea.title || '')}" 
                 onchange="updateIdeaField('${idea.id}', 'title', this.value)"
-                class="w-full bg-transparent font-semibold text-zinc-200 text-base mb-2 outline-none border-b border-transparent focus:border-zinc-600 transition-colors" />
+                class="w-full bg-transparent font-serif-anthropic text-lg text-neutral-100 mb-2 outline-none focus:text-[#60a5fa] border-b border-transparent focus:border-[#262626] transition-colors" />
 
-              <!-- Résumé modifiable -->
+              <!-- Résumé -->
               <textarea rows="3" onchange="updateIdeaField('${idea.id}', 'summary', this.value)"
-                class="w-full bg-zinc-950/60 border border-zinc-800/60 rounded-xl p-2.5 text-xs text-zinc-400 leading-relaxed outline-none focus:border-zinc-600 transition-colors">${escapeHtml(idea.summary || '')}</textarea>
+                class="w-full bg-black/50 border border-[#1f1f1f] p-2.5 text-xs text-neutral-400 leading-relaxed outline-none focus:border-[#333333] transition-colors">${escapeHtml(idea.summary || '')}</textarea>
             </div>
 
-            <div class="mt-2 pt-3 border-t border-zinc-800/60 flex items-center justify-between text-xs text-zinc-500">
-              <span class="flex items-center gap-1">
-                <i data-lucide="clock" class="w-3 h-3"></i>
-                ${dateStr}
-              </span>
-              <div class="flex gap-1">${tagsHtml}</div>
+            <!-- Footer idée : Statut & Date -->
+            <div class="pt-3 border-t border-[#1f1f1f] flex items-center justify-between text-[11px] font-mono-code text-neutral-500">
+              <span>${dateStr}</span>
+              
+              <select onchange="updateIdeaField('${idea.id}', 'status', this.value)" class="bg-black border border-[#262626] text-neutral-300 text-[10px] uppercase px-2 py-0.5 outline-none cursor-pointer">
+                <option value="capturée" ${idea.status === 'capturée' ? 'selected' : ''}>Capturée</option>
+                <option value="à qualifier" ${idea.status === 'à qualifier' ? 'selected' : ''}>À qualifier</option>
+                <option value="en cours" ${idea.status === 'en cours' ? 'selected' : ''}>En cours</option>
+                <option value="validée" ${idea.status === 'validée' ? 'selected' : ''}>Validée</option>
+                <option value="abandonnée" ${idea.status === 'abandonnée' ? 'selected' : ''}>Abandonnée</option>
+              </select>
             </div>
           </div>
         `;
@@ -330,17 +502,23 @@
       e.preventDefault();
       const titleInput = document.getElementById('new-idea-title');
       const summaryInput = document.getElementById('new-idea-summary');
+      const catInput = document.getElementById('new-idea-category');
+      const impInput = document.getElementById('new-idea-importance');
+
       const title = titleInput.value.trim();
       const summary = summaryInput.value.trim();
+      const category = catInput.value;
+      const importance = impInput.value;
       if (!title) return;
 
-      const { data } = await supabaseClient.from('ideas').insert([{ title, summary, status: 'capturée' }]).select();
+      const { data } = await supabaseClient.from('ideas').insert([{ title, summary, category, importance, status: 'capturée' }]).select();
       if (data) {
         ideas.unshift(data[0]);
         titleInput.value = '';
         summaryInput.value = '';
+        toggleIdeaForm();
         renderIdeas();
-        notify('Idée créée');
+        notify('Idée enregistrée');
       }
     }
 
@@ -349,6 +527,7 @@
       const i = ideas.find(item => item.id === id);
       if (i) i[field] = value;
       notify();
+      if (field === 'category' || field === 'importance') renderIdeas();
     }
 
     async function deleteIdea(id) {
@@ -360,70 +539,70 @@
     }
 
     // ==========================================
-    // INBOX
+    // INBOX (DATABASE VIEW)
     // ==========================================
-    function renderInbox() {
-      const list = document.getElementById('inbox-list');
+    function renderInboxTable() {
+      const body = document.getElementById('inbox-table-body');
       document.getElementById('inbox-count').innerText = inboxItems.length;
 
       if (inboxItems.length === 0) {
-        list.innerHTML = `<div class="text-center py-16 text-zinc-500 border border-dashed border-zinc-800 rounded-2xl text-sm">Inbox vide.</div>`;
+        body.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-neutral-600 font-mono-code text-xs">AUCUNE DONNÉE DANS L'INBOX.</td></tr>`;
         return;
       }
 
-      list.innerHTML = inboxItems.map(item => {
+      body.innerHTML = inboxItems.map(item => {
         const dateStr = new Date(item.created_at).toLocaleString('fr-FR', {
           day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
         });
 
-        let badgeColor = 'bg-zinc-800 text-zinc-300 border-zinc-700';
-        if (item.entity_type === 'task') badgeColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-        if (item.entity_type === 'idea') badgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-        if (item.entity_type === 'conversation') badgeColor = 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+        let typeColor = 'text-neutral-400';
+        if (item.entity_type === 'task') typeColor = 'text-[#facc15]';
+        if (item.entity_type === 'idea') typeColor = 'text-[#60a5fa]';
 
         return `
-          <div class="bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 rounded-2xl p-5 space-y-3 transition-all">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <select onchange="updateInboxField('${item.id}', 'entity_type', this.value)" class="border text-xs rounded-lg px-2 py-1 outline-none cursor-pointer ${badgeColor}">
-                  <option value="task" ${item.entity_type === 'task' ? 'selected' : ''}>Task</option>
-                  <option value="idea" ${item.entity_type === 'idea' ? 'selected' : ''}>Idea</option>
-                  <option value="note" ${item.entity_type === 'note' ? 'selected' : ''}>Note</option>
-                  <option value="conversation" ${item.entity_type === 'conversation' ? 'selected' : ''}>Conversation</option>
-                  <option value="skill" ${item.entity_type === 'skill' ? 'selected' : ''}>Skill</option>
-                </select>
+          <tr class="hover:bg-[#111111] transition-colors">
+            <!-- Date -->
+            <td class="p-3 border-r border-[#1f1f1f] text-neutral-500 whitespace-nowrap text-[11px]">
+              ${dateStr}
+            </td>
 
-                <span class="text-xs text-zinc-500 flex items-center gap-1">
-                  <i data-lucide="clock" class="w-3 h-3"></i>
-                  ${dateStr}
-                </span>
-              </div>
+            <!-- Entité -->
+            <td class="p-3 border-r border-[#1f1f1f]">
+              <select onchange="updateInboxField('${item.id}', 'entity_type', this.value)" class="bg-black border border-[#262626] text-[10px] uppercase px-1.5 py-0.5 outline-none font-medium cursor-pointer ${typeColor}">
+                <option value="task" ${item.entity_type === 'task' ? 'selected' : ''}>Task</option>
+                <option value="idea" ${item.entity_type === 'idea' ? 'selected' : ''}>Idea</option>
+                <option value="note" ${item.entity_type === 'note' ? 'selected' : ''}>Note</option>
+              </select>
+            </td>
 
-              <div class="flex items-center gap-2">
-                <select onchange="updateInboxField('${item.id}', 'status', this.value)" class="bg-zinc-950 border border-zinc-800 text-zinc-400 text-xs rounded-lg px-2 py-1 outline-none focus:border-zinc-600 cursor-pointer">
-                  <option value="processed" ${item.status === 'processed' ? 'selected' : ''}>Traité</option>
-                  <option value="pending" ${item.status === 'pending' ? 'selected' : ''}>En attente</option>
-                  <option value="archived" ${item.status === 'archived' ? 'selected' : ''}>Archivé</option>
-                </select>
+            <!-- Note brute éditable -->
+            <td class="p-2 border-r border-[#1f1f1f]">
+              <input type="text" value="${escapeHtml(item.raw_note || '')}" 
+                onchange="updateInboxField('${item.id}', 'raw_note', this.value)"
+                class="w-full bg-transparent px-2 py-1 text-neutral-200 text-xs font-sans outline-none focus:bg-black focus:border border-[#333333] transition-colors" />
+            </td>
 
-                <button onclick="deleteInboxItem('${item.id}')" title="Supprimer" class="text-zinc-600 hover:text-red-400 p-1 transition-colors">
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
-              </div>
-            </div>
+            <!-- Raisonnement IA -->
+            <td class="p-3 border-r border-[#1f1f1f] text-neutral-500 text-[11px] leading-relaxed">
+              ${escapeHtml(item.reason || '-')}
+            </td>
 
-            <div>
-              <label class="block text-[10px] uppercase font-semibold text-zinc-500 mb-1">Note brute (modifiable en direct)</label>
-              <textarea onchange="updateInboxField('${item.id}', 'raw_note', this.value)" rows="2" class="w-full bg-zinc-950 border border-zinc-800/80 rounded-xl p-3 text-sm text-zinc-200 outline-none focus:border-zinc-600 transition-colors leading-relaxed">${escapeHtml(item.raw_note || '')}</textarea>
-            </div>
+            <!-- Statut -->
+            <td class="p-3 border-r border-[#1f1f1f]">
+              <select onchange="updateInboxField('${item.id}', 'status', this.value)" class="bg-black border border-[#262626] text-[10px] uppercase text-neutral-400 px-1.5 py-0.5 outline-none cursor-pointer">
+                <option value="processed" ${item.status === 'processed' ? 'selected' : ''}>Processed</option>
+                <option value="pending" ${item.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="archived" ${item.status === 'archived' ? 'selected' : ''}>Archived</option>
+              </select>
+            </td>
 
-            ${item.reason ? `
-              <div class="text-xs text-zinc-400 bg-zinc-950/40 p-2.5 rounded-lg border border-zinc-800/50 flex items-start gap-2">
-                <span class="text-zinc-500">🤖</span>
-                <span><span class="text-zinc-500 font-medium">Raisonnement IA :</span> ${escapeHtml(item.reason)}</span>
-              </div>
-            ` : ''}
-          </div>
+            <!-- Action -->
+            <td class="p-3 text-center">
+              <button onclick="deleteInboxItem('${item.id}')" class="text-neutral-600 hover:text-red-400 transition-colors">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5 mx-auto"></i>
+              </button>
+            </td>
+          </tr>
         `;
       }).join('');
       lucide.createIcons();
@@ -434,18 +613,17 @@
       const item = inboxItems.find(i => i.id === id);
       if (item) item[field] = value;
       notify();
-      if (field === 'entity_type') renderInbox();
+      if (field === 'entity_type') renderInboxTable();
     }
 
     async function deleteInboxItem(id) {
-      if (!confirm('Supprimer cette capture de l’inbox ?')) return;
+      if (!confirm('Supprimer définitivement cette entrée ?')) return;
       await supabaseClient.from('inbox').delete().eq('id', id);
       inboxItems = inboxItems.filter(i => i.id !== id);
-      renderInbox();
-      notify('Inbox mise à jour');
+      renderInboxTable();
+      notify('Supprimé de l’inbox');
     }
 
-    // Protection anti-injection
     function escapeHtml(str) {
       return String(str)
         .replace(/&/g, '&amp;')
@@ -455,7 +633,6 @@
         .replace(/>/g, '&gt;');
     }
 
-    // Chargement initial
     window.addEventListener('DOMContentLoaded', () => {
       switchTab('tasks');
       loadData();
